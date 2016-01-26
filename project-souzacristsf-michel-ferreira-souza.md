@@ -1,4 +1,4 @@
-# MongoDb - Projeto Final  
+﻿# MongoDb - Projeto Final  
 autor - [Michel Ferreira Souza](https://github.com/souzacristsf)
 Data - 24/01/2016
 
@@ -32,7 +32,6 @@ users{
 
 ```
 projects{
-         "_id": ObjectId,
          "name": String,
          "description": String,
          "date_begin": Date,
@@ -56,16 +55,26 @@ projects{
             "realocate": boolean,
             "expired": Date,
             "tags": [],
+            "historic": [{
+               "data_realocate" : Date
+            }],
             "activities": [
-                { "activity_id": ObjectId 
+                { 
+                  "activity_id": ObjectId 
                 }
             ]
          }],
         "tags": [],
         "comments": [{
-            "user_id": ObjectId,
-            "text": String,
-            "date_comment": String
+               "user_id: [{ObjectId}],
+               "text": String,
+               "date_comment": Date,
+               "notify" : boolean,
+               "files": [{
+                   "name": String,
+                   "size": String>,
+                   "data": Date,
+                   "type": String
         }]
 }
 ```
@@ -73,7 +82,6 @@ projects{
 ## Qual a modelagem da sua coleção retirada de `projects`?  
 ```js
 activities{
-           "_id": ObjectId,
            "name": String,
            "description": String,
            "date_begin": Date,
@@ -82,22 +90,32 @@ activities{
            "realocate": boolean,
            "expired": Date,
            "tags": [],
-           "historic": [],
+           "historic": [{
+               "data_realocate" : Date
+           }],
            "user_id": [{ObjectId}],
            "comments": [{
-               "user_id: ObjectId,
+               "user_id": ObjectId,
                "text": String,
-               "date_comment": Date 
-           }],
-           "files": [{
-               "name": String,
-               "size": String>,
-               "data": Date,
-               "type": String
+               "date_comment": Date,
+               "notify" : boolean,
+               "files": [{
+                   "name": String,
+                   "size": String,
+                   "data": Date,
+                   "type": String
+               }]
            }]
 }
 ```
-> olhando para a modelagem relacional, optei por esse tipo de estrutura pois foi o melhor caminho que achei. Onde o projeto poderá ter varias atividades e nessas atividades podem existir um ou muitos usuarios envolvidos da mesma maneira os comentarios e arquivos.
+> olhando para o modelo relacional, minha ideia era fazer 4 coleção, onde teriamos;
+
+ - Comments -> "Nesse caso, olhando para o modelo teriamos **comment** e **file** na coleção `projects` e `activities`, "Redundância". Para os dois modelos dado aqui, usariamos o **GridFS** para armazenar e recuperar arquivos que excedessem o BSON" e deixando apenas o **comment_id** de referencia na coleção `projects` e `activities`.
+ - Activities 
+ - Projects
+ - Users
+
+Então conversando com o Suissa que disse apenas 3 coleções `Activities`, `Projects`, `Users`, optei por esse tipo de estrutura pois foi o melhor caminho que achei. Onde o projeto poderá ter varias atividades e nessas atividades podem existir um ou muitos usuarios envolvidos da mesma maneira os comentarios e arquivos.
 
 
 ## Create - cadastro  
@@ -107,7 +125,7 @@ activities{
 Segue os usuario cadastrados no banco:
 
 ```js
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "ffamoso",  
 ...            "password": "ff102030", 
@@ -127,7 +145,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "bbeleza",  
 ...            "password": "bb102030", 
@@ -147,7 +165,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "spano",
 ...            "password": "sp102030", 
@@ -167,7 +185,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "mtranquilidade",
 ...            "password": "mt102030", 
@@ -187,7 +205,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "jgrande",
 ...            "password": "jg102030", 
@@ -207,7 +225,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "msouza",
 ...            "password": "ms102030", 
@@ -227,7 +245,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "rrua",
 ...            "password": "rr102030", 
@@ -247,7 +265,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "jesquina",
 ...            "password": "je102030", 
@@ -267,7 +285,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "rgugu",
 ...            "password": "rg102030", 
@@ -287,7 +305,7 @@ WriteResult({
   "nInserted": 1
 })
 
-Souza(mongod-3.0.8) user> db.users.save({
+Souza(mongod-3.0.8) be-mean-project> db.users.save({
 ...         "auth": [{
 ...            "username": "erocha",
 ...            "password": "er102030", 
@@ -321,7 +339,7 @@ WriteResult({
          - cada goal com pelo menos 3 tags;
          - cada goal com pelo menos 2 atividades, deixe 1 projeto sem.
 ```js
-Souza(mongod-3.0.8) user> db.users.find({},{_id: 1})
+Souza(mongod-3.0.8) be-mean-project> db.users.find({},{_id: 1})
 {
   "_id": ObjectId("56a4f94e06ee6e088e75c90b")
 }
@@ -353,9 +371,9 @@ Souza(mongod-3.0.8) user> db.users.find({},{_id: 1})
   "_id": ObjectId("56a4fba406ee6e088e75c914")
 }
 
-var idUsers = db.users.find({}, {_id: 1}).toArray()
+Souza(mongod-3.0.8) be-mean-project> var idUsers = db.users.find({}, {_id: 1}).toArray()
 
-db.projects.insert({
+Souza(mongod-3.0.8) be-mean-project> db.projects.insert({
          "name": "Lagoa",
          "description": "Sistema para limpar a lagoa",	
          "date_begin": ISODate("2013-01-05T04:14:20.480Z"),
@@ -365,7 +383,8 @@ db.projects.insert({
          "realocate": null,
          "expired": ISODate("2016-03-01T09:00:00Z"),
          "visualizable_mod": null,
-         "members": [{
+         "members": [
+         {
             "user_id" : idUsers[0]._id,
             "type_member": "owner", 
             "notify" : true
@@ -389,7 +408,8 @@ db.projects.insert({
             "user_id" : idUsers[4]._id,
             "type_member": "member", 
             "notify" : false
-         }],
+         }
+         ],
          "goals": [{
             "name": "Iniciar o start",
             "description": "començando a porra do objetivo",
@@ -399,15 +419,30 @@ db.projects.insert({
             "realocate": null,
             "expired": ISODate("2016-03-01T09:00:00Z"),
             "tags": ["start","restart","reeestart"],
+            "historic": [{
+               "data_realocate" : null
+            }],
             "activities": [
                 { "activity_id": ObjectId("56a6bcc37c93e0301539990d") },
 		{ "activity_id": ObjectId("56a6bcdc7c93e0301539990e") }
             ]
          }],
-        "tags": ["NodeJs","Redis","AngularJS 2"]
+        "tags": ["NodeJs","Redis","AngularJS 2"],
+        "comments": [{
+               "user_id": null,
+               "text": null,
+               "date_comment": null,
+               "notify" : null,
+               "files": [{
+                   "name": null,
+                   "size": null,
+                   "data": null,
+                   "type": null
+               }]
+        }]
 })
 
-db.projects.insert({
+Souza(mongod-3.0.8) be-mean-project> db.projects.insert({
          "name": "Recuperação Florestal",
          "description": "Sistema para colorir a fazenda zica do pantano, muita viagem",	
          "date_begin": ISODate("2013-01-05T04:14:20.480Z"),
@@ -451,15 +486,30 @@ db.projects.insert({
             "realocate": null,
             "expired": ISODate("2016-03-01T09:00:00Z"),
             "tags": ["Azul","Verde","Vermelho"],
+            "historic": [{
+               "data_realocate" : null
+            }],
             "activities": [
                 { "activity_id": ObjectId("56a6be2a6aa8571b1c114acd") },
 		{ "activity_id": ObjectId("56a6be2a6aa8571b1c114ace") }
             ]
          }],
-        "tags": ["HTML","Jquery","Mongodb"]
+        "tags": ["HTML","Jquery","Mongodb"],
+        "comments": [{
+               "user_id": null,
+               "text": null,
+               "date_comment": null,
+               "notify" : null,
+               "files": [{
+                   "name": null,
+                   "size": null,
+                   "data": null,
+                   "type": null
+               }]
+        }]
 })
 
-db.projects.insert({
+Souza(mongod-3.0.8) be-mean-project> db.projects.insert({
          "name": "Dengue Mata",
          "description": "Sistema para acabar com o mosquito aedes aegypti",	
          "date_begin": ISODate("2013-01-05T04:14:20.480Z"),
@@ -503,15 +553,30 @@ db.projects.insert({
             "realocate": null,
             "expired": ISODate("2016-03-01T09:00:00Z"),
             "tags": ["Voa","Picada","Tem Asa"],
+            "historic": [{
+               "data_realocate" : null
+            }],
             "activities": [
                 { "activity_id": ObjectId("56a6be2a6aa8571b1c114acf") },
 		{ "activity_id": ObjectId("56a6be2a6aa8571b1c114ad0") }
             ]
          }],
-        "tags": ["Mongodb","Redis","Neo4j"]
+        "tags": ["Mongodb","Redis","Neo4j"],
+        "comments": [{
+               "user_id": null,
+               "text": null,
+               "date_comment": null,
+               "notify" : null,
+               "files": [{
+                   "name": null,
+                   "size": null,
+                   "data": null,
+                   "type": null
+               }]
+        }]
 })
 
-db.projects.insert({
+Souza(mongod-3.0.8) be-mean-project> db.projects.insert({
          "name": "Matagal",
          "description": "Sistema para limpar a fazenda zica do pantano",	
          "date_begin": ISODate("2013-01-05T04:14:20.480Z"),
@@ -555,15 +620,30 @@ db.projects.insert({
             "realocate": null,
             "expired": ISODate("2016-03-01T09:00:00Z"),
             "tags": ["Machado","Enxada","Seh Pah"],
+            "historic": [{
+               "data_realocate" : null
+            }],
             "activities": [
                 { "activity_id": ObjectId("56a6be2a6aa8571b1c114ad1") },
 		{ "activity_id": ObjectId("56a6be2c6aa8571b1c114ad2") }
             ]
          }],
-        "tags": ["Mongodb","Redis","Neo4j"]
+        "tags": ["Mongodb","Redis","Neo4j"],
+        "comments": [{
+               "user_id": null,
+               "text": null,
+               "date_comment": null,
+               "notify" : null,
+               "files": [{
+                   "name": null,
+                   "size": null,
+                   "data": null,
+                   "type": null
+               }]
+        }]
 })
 
-db.projects.insert({
+Souza(mongod-3.0.8) be-mean-project> db.projects.insert({
          "name": "Horario de Verão",
          "description": "Sistema para controlar o horario de verao e reduzir custo",	
          "date_begin": ISODate("2013-01-05T04:14:20.480Z"),
@@ -607,9 +687,24 @@ db.projects.insert({
             "realocate": null,
             "expired": ISODate("2016-03-01T09:00:00Z"),
             "tags": ["Nos que tá","Nos que voa","Nos somos loko"],
+            "historic": [{
+               "data_realocate" : null
+            }],
             "activities": []
          }],
-        "tags": ["Express","Ionic","Cordova", "NodeJs"]
+        "tags": ["Express","Ionic","Cordova", "NodeJs"],
+        "comments": [{
+               "user_id": null,
+               "text": null,
+               "date_comment": null,
+               "notify" : null,
+               "files": [{
+                   "name": null,
+                   "size": null,
+                   "data": null,
+                   "type": null
+               }]
+        }]
 })
 ```
 ## Retrieve - busca
@@ -617,8 +712,8 @@ db.projects.insert({
 #### 1. Liste as informações dos membros de 1 projeto específico que deve ser buscado pelo seu nome de forma a não ligar para maiúsculas e minúsculas.
 
 ```js
-Souza(mongod-3.0.8) user> var membersId = db.projects.find({name: /lagoa/i}, {_id: 0, members.user_id: 1})
-Souza(mongod-3.0.8) user> membersId
+Souza(mongod-3.0.8) be-mean-project> var membersId = db.projects.find({name: /lagoa/i}, {_id: 0, members.user_id: 1})
+Souza(mongod-3.0.8) be-mean-project> membersId
 [
   {
     "members": [
@@ -641,10 +736,10 @@ Souza(mongod-3.0.8) user> membersId
   }
 ]
 
-Souza(mongod-3.0.8) user> var members = [];
-Souza(mongod-3.0.8) user> var membersId = db.projects.find({name: /lagoa/i}, {_id: 0, "members.user_id": 1})
-Souza(mongod-3.0.8) user> var setMembersArray = function (member) {members.push(db.users.findOne({ _id: member.user_id }))};
-Souza(mongod-3.0.8) user> membersId.members.forEach(setMembersArray); 
+Souza(mongod-3.0.8) be-mean-project> var members = [];
+Souza(mongod-3.0.8) be-mean-project> var membersId = db.projects.find({name: /lagoa/i}, {_id: 0, "members.user_id": 1})
+Souza(mongod-3.0.8) be-mean-project> var setMembersArray = function (member) {members.push(db.users.findOne({ _id: member.user_id }))};
+Souza(mongod-3.0.8) be-mean-project> membersId.members.forEach(setMembersArray); 
 
 {
   "_id": ObjectId("56a4f94e06ee6e088e75c90b"),
@@ -741,7 +836,7 @@ Souza(mongod-3.0.8) user> membersId.members.forEach(setMembersArray);
 
 #### 2. Liste todos os projetos com a tag que você escolheu para os 3 projetos em comum.
 ```js
-Souza(mongod-3.0.8) user> db.projects.find({tags: {$eq: "Mongodb"}},{name: 1})
+Souza(mongod-3.0.8) be-mean-project> db.projects.find({tags: {$eq: "Mongodb"}},{name: 1})
 {
   "_id": ObjectId("56a5147bef71215f519d076a"),
   "name": "Recuperação Florestal"
