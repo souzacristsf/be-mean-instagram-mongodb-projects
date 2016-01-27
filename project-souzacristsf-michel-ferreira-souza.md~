@@ -854,20 +854,8 @@ Souza(mongod-3.0.8) be-mean-project> db.projects.find({tags: {$eq: "Mongodb"}},{
 #### 3. Liste apenas os nomes de todas as atividades para todos os projetos.
 ```js
 
-Souza(mongod-3.0.8) be-mean-project> var dataActivities = db.activities.find({},{_id: 1, name: 1}).toArray()
-
-dataActivities.forEach(function(data){
-      printjson(data)
-
-})
-
-var dataActivities = db.activities.find({},{_id: 1, name: 1}).toArray();
-dataActivities.forEach(function (data) {
-          var projects = db.projects.findOne({"goals.activities.activity_id": data._id, "goals.activities.activity_id": {$exists: true}}, {_id: 0, name: 1});
-          printjson(projects)
-      
-})
 ```
+
 
 #### 4. Liste todos os projetos que não possuam uma tag.
 
