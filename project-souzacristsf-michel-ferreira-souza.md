@@ -868,6 +868,11 @@ dataActivities.forEach(function (data) {
       
 })
 ```
+  // obter todos os comentários de um usuário que unem as mensagens para obter o título 
+  var comments = db.comments.find({user: 'leto'}, {post_id: true})
+  var postIds = comments.map(function(c) { return c.post_id; });
+  db.posts.find({_id: {$in: postIds}}, {title: true});
+ 
 
 #### 4. Liste todos os projetos que não possuam uma tag.
 
