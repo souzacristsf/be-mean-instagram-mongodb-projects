@@ -854,34 +854,42 @@ Souza(mongod-3.0.8) be-mean-project> db.projects.find({tags: {$eq: "Mongodb"}},{
 #### 3. Liste apenas os nomes de todas as atividades para todos os projetos.
 ```js
 
-Souza(mongod-3.0.8) be-mean-project> var dataActivities = db.activities.find({},{_id: 1, name: 1}).toArray()
+var nameActivitiesId = db.activities.find({},{_id: 1, name: 1});
 
-dataActivities.forEach(function(data){
-      printjson(data)
+var nameProjectActivitie = function(activities) {
+    nomeProjetoAtividade = { projeto: "", atividades: "" };
 
-})
+    activities.forEach(function(a){ 
+        var projects = db.projects.find({"goals.activities.activity_id": {$exists: true}, "goals.activities.activity_id": a._id});
+        projects.forEach(function(p){ 
+            nomeProjetoAtividade.projeto = p.name;
+            nomeProjetoAtividade.atividades = a.name;
+        })
+    });
 
-var dataActivities = db.activities.find({},{_id: 1, name: 1}).toArray();
-dataActivities.forEach(function (data) {
-          var projects = db.projects.findOne({"goals.activities.activity_id": data._id, "goals.activities.activity_id": {$exists: true}}, {_id: 0, name: 1});
-          printjson(projects)
-      
-})
+    return nomeProjetoAtividade;
+};
+
+nameProjectActivitie(nameActivitiesId);
+
+
 ```
-var dataActivities = db.activities.find({},{_id: 1, name: 1});
-var projects = dataActivities.map(function(c) { return {c._id , c.name} ; });
-db.projects.find({"goals.activities.activity_id": projects, "goals.activities.activity_id": {$exists: true}}, {_id: 0, name: 1});
-
-  // obter todos os comentários de um usuário que unem as mensagens para obter o título 
-  var comments = db.comments.find({user: 'leto'}, {post_id: true})
-  var postIds = comments.map(function(c) { return c.post_id; });
-  db.posts.find({_id: {$in: postIds}}, {title: true});
  
 
 #### 4. Liste todos os projetos que não possuam uma tag.
 
 
 #### 5. Liste todos os usuários que não fazem parte do primeiro projeto cadastrado.
+```js
+var neUser = [];
+
+var membersProjects = db.projects.findOne({},{members: 1, _id: 0});
+
+var getUser = function(data){neUser.push(db.users.find(data.user_id, {name: 1}))._id}
+
+membersProjects.members.forEach(getUser)
+
+db.users.find(neUser);
 
 ## Update - alteração
 
