@@ -868,6 +868,10 @@ dataActivities.forEach(function (data) {
       
 })
 ```
+var dataActivities = db.activities.find({},{_id: 1, name: 1});
+var projects = dataActivities.map(function(c) { return {c._id , c.name} ; });
+db.projects.find({"goals.activities.activity_id": projects, "goals.activities.activity_id": {$exists: true}}, {_id: 0, name: 1});
+
   // obter todos os comentários de um usuário que unem as mensagens para obter o título 
   var comments = db.comments.find({user: 'leto'}, {post_id: true})
   var postIds = comments.map(function(c) { return c.post_id; });
