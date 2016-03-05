@@ -871,31 +871,83 @@ var nameProjectActivitie = function(activities) {
 };
 
 nameProjectActivitie(nameActivitiesId);
-
-
 ```
  
 
 #### 4. Liste todos os projetos que não possuam uma tag.
+```js
+souzacrists(mongod-3.2.3) be-mean-project> var query = {tags: {$ne: {$in: [/mongodb/i]}}};
 
+souzacrists(mongod-3.2.3) be-mean-project> db.projects.find(query, {name: 1});
+
+{
+  "_id": ObjectId("56db2fd32dfa5f26e992d9dd"),
+  "name": "Lagoa"
+}
+{
+  "_id": ObjectId("56db2fdf2dfa5f26e992d9de"),
+  "name": "Recuperação Florestal"
+}
+{
+  "_id": ObjectId("56db2feb2dfa5f26e992d9df"),
+  "name": "Dengue Mata"
+}
+{
+  "_id": ObjectId("56db2ff42dfa5f26e992d9e0"),
+  "name": "Matagal"
+}
+{
+  "_id": ObjectId("56db2ffd2dfa5f26e992d9e1"),
+  "name": "Horario de Verão"
+}
+```
 
 #### 5. Liste todos os usuários que não fazem parte do primeiro projeto cadastrado.
 ```js
-var neUser = [];
-
-var membersProjects = db.projects.findOne({},{members: 1, _id: 0});
-
-var getUser = function(data){neUser.push(db.users.find(data.user_id, {name: 1}))._id}
-
-membersProjects.members.forEach(getUser)
-
-db.users.find(neUser);
-
+souzacrists(mongod-3.2.3) be-mean-project> var neUser = [];
+souzacrists(mongod-3.2.3) be-mean-project> var membersProjects = db.projects.findOne({},{members: 1, _id: 0});
+souzacrists(mongod-3.2.3) be-mean-project> var getUser = function(data){neUser.push(db.users.findOne(data.user_id, {name: 1})._id)}
+souzacrists(mongod-3.2.3) be-mean-project> membersProjects.members.forEach(getUser)
+souzacrists(mongod-3.2.3) be-mean-project> db.users.find({_id: {$ne: {$in: neUser}}});
+```
 ## Update - alteração
 
 #### 1. Adicione para todos os projetos o campo `views: 0`.
+```js
+souzacrists(mongod-3.2.3) be-mean-project> var mod = {$set: {views: 0}};
+souzacrists(mongod-3.2.3) be-mean-project> var option = {multi: true};
+souzacrists(mongod-3.2.3) be-mean-project> db.projects.update({}, mod, option);
+Updated 5 existing record(s) in 3ms
+WriteResult({
+  "nMatched": 5,
+  "nUpserted": 0,
+  "nModified": 5
+})
+```
 #### 2. Adicione 1 tag diferente para cada projeto.
+```js
+souzacrists(mongod-3.2.3) be-mean-project> var modProject = db.projects.find({}, {_id: 1}).toArray();
+souzacrists(mongod-3.2.3) be-mean-project> for(var i = 0; i < modProject.length; i++){
+...     db.projects.update({_id: modProject[i]._id},{$push: {tags: "tag "+ i}});
+... }
+Updated 1 existing record(s) in 2ms
+Updated 1 existing record(s) in 2ms
+Updated 1 existing record(s) in 2ms
+Updated 1 existing record(s) in 1ms
+Updated 1 existing record(s) in 2ms
+WriteResult({
+  "nMatched": 1,
+  "nUpserted": 0,
+  "nModified": 1
+})
+```
 #### 3. Adicione 2 membros diferentes para cada projeto.
+```js
+var data = {"type_member": "owner", "notify": true};
+var users = db.users.find().toArray();
+var members = db.projects.find({},{_id: 0, members: 1}).toArray();
+
+```
 #### 4. Adicione 1 comentário em cada atividade, deixe apenas 1 projeto sem.
 #### 5. Adicione 1 projeto inteiro com UPSERT.
 
